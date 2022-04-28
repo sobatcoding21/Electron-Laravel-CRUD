@@ -1,0 +1,185 @@
+
+<button id="refresh" class="button" style="float:right;margin-left: 5px;">Refresh Data</button>
+<table id="table-users" class="table datatable mdl-data-table" style="width:100%">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Address</th>
+            <th>Phone</th>
+            <th>Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<div class="modal" id="modal-edit">
+    <div class="modal-background"></div>
+        <div class="modal-card">
+            <form id="form-edit-user" action="" method="POST">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Edit User</p>
+                    <button class="delete modal-close" aria-label="close"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Fullname</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <p class="control">
+                                <input class="input" name="fullname" type="text" placeholder="Full name" required >
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Username</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <p class="control">
+                                <input class="input" name="username" type="text" placeholder="Your username" required>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Address</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <p class="control">
+                                    <textarea name="address" class="textarea" placeholder="Address" required></textarea>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Phone</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <p class="control">
+                                    <input class="input" name="phone" type="text" placeholder="+62 .." required>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <input type="hidden" name="id" value="">
+                    <button class="button is-success">Save changes</button>
+                    <button class="button modal-close">Cancel</button>
+                </footer>
+            </form>
+        </div>
+  </div>
+
+<script>
+
+    InitTable();
+    $(document).on('click', '#refresh', function(e) {
+        InitTable()
+    })
+
+    $(document).on('click', '.select-item', function(e) {
+        var dt = $(this).data('source');
+        resetFormEdit();
+        fetchData(dt);
+        $('#form-edit-user').attr('action', 'http://localhost:8080/users/update/' + dt.id)
+        $("#modal-edit").addClass("is-active");
+    })
+
+    $(".modal-close").click(function() {
+ 
+        $("#modal-edit").removeClass("is-active");
+
+    });
+
+    $(document).on('submit', '#form-edit-user', function() {
+        $.ajax({
+            url: $('#form-edit-user').attr('action'),
+            type: "POST",
+            data: $('#form-edit-user').serialize(),
+            success: function(results) {
+                resetFormEdit()
+                $("#modal-edit").removeClass("is-active")
+                console.log(results)
+                ipcRenderer.send('message', {'message' : results.message} )
+            },
+            error: function (request, status, error) {
+                ipcRenderer.send('message', {
+                    'message' : request.responseJSON.message
+                })
+            }
+        });
+
+        return false;
+    })
+
+    async function InitTable()
+    {
+        $('#table-users').on('xhr.dt', function ( e, settings, json, xhr ) {
+
+        } ).DataTable({
+        responsive: true,
+        language: {
+            searchPlaceholder: 'Search...',
+        },
+        processing: true,
+        ajax: 'http://localhost:8080/users',
+        scrollX: true,
+        destroy: true,
+        columns: [
+            { "data": "name"},
+            { "data": "username"},
+            { "data": "address"},
+            { "data": "phone"},
+            { "data": "created_at"},
+        ],
+        "order": [[ 0, "ASC" ]],
+        "columnDefs": [
+            //{ "width": "4%", "targets": 0 },
+            
+        ],
+        "order": [[ 1, "desc" ]],
+        "createdRow": function( row, data, dataIndex ) {
+            $(row).addClass( 'select-item cursor' );
+            $(row).attr('data-source', JSON.stringify(data));
+        },
+        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+            
+        },
+        "drawCallback": function () {
+            //$('.dataTables_paginate > .pagination').addClass('pagination-rounded');
+            //feather.replace();
+        }
+        });
+    }
+
+    function resetFormEdit()
+    {
+        $('input[name=fullname]').val('')
+        $('input[name=username]').val('')
+        $('textarea[name=address]').val('')
+        $('input[name=phone]').val('')
+        $('input[name=id]').val('')
+    }
+
+    function fetchData(data)
+    {
+        $('input[name=fullname]').val(data.name)
+        $('input[name=username]').val(data.username)
+        $('textarea[name=address]').val(data.address)
+        $('input[name=phone]').val(data.phone)
+        $('input[name=id]').val(data.id)
+    }
+</script>

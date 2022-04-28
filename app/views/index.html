@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">        
+        <title>Laravel Electron</title>
+        <link rel="stylesheet" href="../assets/css/style.css" />
+        <link rel="stylesheet" href="../assets/css/tab.css" />
+        <link rel="stylesheet" href="../assets/css/bulma.min.css" />
+        <link rel="stylesheet" href="../assets/css/datTables.bulma.min.css" />
+
+    </head>
+    <body>
+        <script>
+            const { ipcRenderer } = require('electron')
+            let $ = jQuery = require('jquery')
+            let dt = require( 'datatables.net' )( window, $ );
+    
+            ipcRenderer.on('add-tab', (event, arg) => {
+                if( $('#'+arg.id).length )
+                {
+                    $('input[radio]').prop('checked', false);
+                    $('#'+arg.id).prop('checked', true);
+                }else{
+                    addTab(arg.id, arg.title, arg.src)
+                }
+            })
+    
+            /* Javascript here */
+    
+            $(document).on('click', '.close-tab', function(e) {
+                console.log('click!');
+                $(this).parent().parent().remove();
+                $('input[radio]').prop('checked', false);
+                $('input[name=css-tabs]:last').prop('checked', true);
+            })
+    
+            function addTab(tabid, title, URL)
+            {
+                $.get(URL, function(result, success)
+                {
+                    $('input[radio]').prop('checked', false);
+                    var elm = '<div class="tab-sobatcoding">\
+                        <input type="radio" name="css-tabs" id="'+tabid+'" class="tab-switch" checked >\
+                        <label for="'+tabid+'" class="tab-label">'+title+'&nbsp;<span class="close-tab">x</span></label>\
+                        <div class="tab-content">'+result+'</div>\
+                    </div>';
+    
+                    $('.tabs-sobatcoding').append(elm);
+    
+                })
+                
+    
+            }
+    
+        </script>
+        <script src="../assets/js/dataTables.bulma.min.js" ></script>
+        
+        <div class="tab-wrapper">
+            <div class="tabs-sobatcoding">
+            </div>
+        </div>
+        
+    </body>
+    
+
+</html>

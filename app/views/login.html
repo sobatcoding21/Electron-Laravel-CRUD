@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login</title>
+        <link rel="stylesheet" href="../assets/css/login.css" />
+    </head>
+    <body>
+        <div class="background">
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+        <form id="form-login" method="POST">
+            <h3>Login Here</h3>
+    
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" placeholder="Email or Phone" autocomplete="off" >
+    
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="Password" autocomplete="off">
+    
+            <button type="submit">Log In</button>
+        </form>
+        <script>
+            const {ipcRenderer, dialog} = require('electron');
+            let $ = jQuery = require('jquery');
+
+            $('#username').trigger('select');
+
+            $(document).on('submit', '#form-login', function() {
+        
+                let username = $('#username').val();
+                let pwd = $('#password').val();
+                if( username == 'admin' && pwd == 'admin' )
+                {
+                    ipcRenderer.send('login')
+                }else{
+                    ipcRenderer.send('login-error')
+                }
+            
+                return false;
+                
+            })
+        </script>
+    </body>
+</html>

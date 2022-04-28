@@ -1,0 +1,19 @@
+{
+  "name": "electron-laravel-crud",
+  "version": "1.0.0",
+  "description": "CRUD using laravel+electron",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "bulma": "^0.9.3",
+    "datatables.net": "^1.11.5",
+    "electron": "^18.1.0",
+    "jquery": "^3.6.0"
+  }
+}
